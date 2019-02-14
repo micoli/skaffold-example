@@ -1,0 +1,37 @@
+apiVersion: skaffold/v1beta4
+kind: Config
+build:
+  artifacts:
+  - image: gcr.io/k8s-skaffold/node-example
+    context: node
+    sync:
+      '*.js': .
+  - image: gcr.io/k8s-skaffold/python-reload
+    context: python
+    sync:
+      '**': /
+
+#deploy:
+#  kubectl:
+#    manifests:
+#    - "**/k8s"
+
+deploy:
+  helm:
+    releases:
+    - name: k8s-helm
+      chartPath: python/k8s-helm
+      #wait: true
+      #valuesFiles:
+      #- helm-skaffold-values.yaml
+      values:
+        image: gcr.io/k8s-skaffold/python-reload
+      #recreatePods will pass --recreate-pods to helm upgrade
+      #recreatePods: true
+      #overrides builds an override values.yaml file to run with the helm deploy
+      #overrides:
+      # some:
+      #   key: someValue
+      #setValues get appended to the helm deploy with --set.
+      #setValues:
+        #some.key: someValue
